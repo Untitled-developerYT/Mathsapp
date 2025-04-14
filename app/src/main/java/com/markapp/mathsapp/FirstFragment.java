@@ -5,8 +5,11 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.fragment.NavHostFragment;
@@ -27,6 +30,36 @@ public class FirstFragment extends Fragment {
     ) {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
+        androidx.constraintlayout.widget.ConstraintLayout mainLayout = binding.mainLayout;
+        Button[] buttons = new Button[10];
+        for (int i = 0; i < 10; i++) {
+            buttons[i] = new android.widget.Button(getContext());
+            buttons[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    System.out.println("button pressed: "+Integer.toString(view.getId()-99));
+                }
+            });
+            buttons[i].setText(Integer.toString(i+1));
+            buttons[i].setId(100+i);
+            android.view.ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(200, 100);
+            buttons[i].setLayoutParams(params);
+            mainLayout.addView(buttons[i]);
+            ConstraintSet cSet = new ConstraintSet();
+            cSet.clone(mainLayout);
+            if (i < 2) {
+                cSet.connect(buttons[i].getId(), ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP, 100);
+            } else {
+                cSet.connect(buttons[i].getId(), ConstraintSet.TOP, buttons[i-2].getId(), ConstraintSet.BOTTOM, 70);
+            }
+            if (i % 2 == 0) {
+                cSet.connect(buttons[i].getId(), ConstraintSet.LEFT, ConstraintSet.PARENT_ID, ConstraintSet.LEFT, 100);
+            } else {
+                cSet.connect(buttons[i].getId(), ConstraintSet.LEFT, buttons[i-1].getId(), ConstraintSet.RIGHT, 70);
+            }
+            cSet.applyTo(mainLayout);
+        }
+
         return binding.getRoot();
 
     }

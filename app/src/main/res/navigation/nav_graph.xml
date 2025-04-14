@@ -34,7 +34,7 @@
     <fragment
         android:id="@+id/SettingsFragment"
         android:name="com.markapp.mathsapp.SettingsFragment"
-        android:label="fragment_settings"
+        android:label="@string/settings_fragment_label"
         tools:layout="@layout/fragment_settings" >
         <action
             android:id="@+id/action_settingsFragment_to_FirstFragment"
