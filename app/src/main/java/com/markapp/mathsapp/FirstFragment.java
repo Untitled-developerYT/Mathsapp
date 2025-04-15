@@ -35,7 +35,8 @@ import java.util.Objects;
 public class FirstFragment extends Fragment {
     private ItemViewModel viewModel;
     private FragmentFirstBinding binding;
-
+    private JSONArray jsonAr;
+    private Button[] buttons;
     private String readTextFromUri(String filename) throws IOException {
         StringBuilder stringBuilder = new StringBuilder();
         try (InputStream inputStream =
@@ -60,18 +61,18 @@ public class FirstFragment extends Fragment {
         androidx.constraintlayout.widget.ConstraintLayout mainLayout = binding.mainLayout;
         Context context = getContext();
         String filename = "problems.json";
-        JSONArray jsonAr = null;
+        jsonAr = null;
         try {
             // Open the JSON file from the assets folder
             System.out.println(filename);
-            String content = readTextFromUri(filename);;
+            String content = readTextFromUri(filename);
             System.out.println(content);
             // Parse the JSON content
             jsonAr = new JSONArray(content);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        Button[] buttons = new Button[10];
+        buttons = new Button[jsonAr.length()];
         for (int i = 0; i < jsonAr.length(); i++) {
             buttons[i] = new android.widget.Button(getContext());
             buttons[i].setOnClickListener(new View.OnClickListener() {
@@ -126,6 +127,15 @@ public class FirstFragment extends Fragment {
             viewModel.readData();
         } catch (Exception e) {
             System.out.println(e);
+        }
+
+        for (int i = 0; i < jsonAr.length(); i++) {
+            buttons[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    System.out.println("button pressed: "+Integer.toString(view.getId()-99));
+                }
+            });
         }
         binding.buttonMult.setOnClickListener(new View.OnClickListener() {
             @Override
