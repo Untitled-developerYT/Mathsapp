@@ -1,6 +1,7 @@
 package com.markapp.mathsapp;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,12 +17,38 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.markapp.mathsapp.databinding.FragmentFirstBinding;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.RandomAccessFile;
+import java.util.Objects;
+
 
 public class FirstFragment extends Fragment {
     private ItemViewModel viewModel;
     private FragmentFirstBinding binding;
+
+    private String readTextFromUri(String filename) throws IOException {
+        StringBuilder stringBuilder = new StringBuilder();
+        try (InputStream inputStream =
+                     getActivity().openFileInput(filename);
+             BufferedReader reader = new BufferedReader(
+                     new InputStreamReader(Objects.requireNonNull(inputStream)))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+        }
+        return stringBuilder.toString();
+    }
 
     @Override
     public View onCreateView(
@@ -31,8 +58,21 @@ public class FirstFragment extends Fragment {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false);
         androidx.constraintlayout.widget.ConstraintLayout mainLayout = binding.mainLayout;
+        Context context = getContext();
+        String filename = "problems.json";
+        JSONArray jsonAr = null;
+        try {
+            // Open the JSON file from the assets folder
+            System.out.println(filename);
+            String content = readTextFromUri(filename);;
+            System.out.println(content);
+            // Parse the JSON content
+            jsonAr = new JSONArray(content);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Button[] buttons = new Button[10];
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < jsonAr.length(); i++) {
             buttons[i] = new android.widget.Button(getContext());
             buttons[i].setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -40,7 +80,12 @@ public class FirstFragment extends Fragment {
                     System.out.println("button pressed: "+Integer.toString(view.getId()-99));
                 }
             });
-            buttons[i].setText(Integer.toString(i+1));
+            try {
+                System.out.println(jsonAr.get(i));
+                buttons[i].setText(jsonAr.getJSONObject(i).getString("question"));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             buttons[i].setId(100+i);
             android.view.ViewGroup.LayoutParams params = new ViewGroup.LayoutParams(200, 100);
             buttons[i].setLayoutParams(params);
